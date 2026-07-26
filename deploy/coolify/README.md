@@ -32,10 +32,12 @@ Without this, the SonarQube container crashes on boot with:
 1. **Project → + New Resource → Docker Compose**.
 2. Pick the Git source from 2.1, select this repository, and set the **branch**
    to deploy (e.g. `master` or your release branch — not necessarily `dev`).
-3. Set **Base Directory** to `deploy/coolify` and **Docker Compose Location** to
-   `docker-compose.yml` (i.e. Coolify should resolve
-   `deploy/coolify/docker-compose.yml`). The build `context: ../..` inside the
-   compose file still correctly reaches the repo root regardless of this setting.
+3. Set **Base Directory** to `/` (repo root — leave it empty/default, do **not**
+   point it at `deploy/coolify`) and **Docker Compose Location** to
+   `deploy/coolify/docker-compose.yml`. The compose file's build `context: .`
+   depends on the project directory being the repo root; pointing Base
+   Directory at a subfolder breaks the relative path resolution (`Error:
+   resolve : lstat /deploy: no such file or directory` during build).
 4. Leave **Build Pack** as Docker Compose (auto-detected once the file is found).
 
 ### 2.3 Environment variables

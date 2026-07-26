@@ -1,7 +1,7 @@
 services:
   sonarqube:
     build:
-      context: ../..
+      context: .
       dockerfile: deploy/coolify/Dockerfile.coolify
     restart: unless-stopped
     depends_on:
