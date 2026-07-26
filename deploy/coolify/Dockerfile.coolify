@@ -1,0 +1,55 @@
+# syntax=docker/dockerfile:1
+
+# ---- Stage 1: build (Gradle + JDK 21) ----
+FROM eclipse-temurin:21-jdk-jammy AS build
+
+WORKDIR /src
+
+# Copy full source tree (build context is the repo root, see docker-compose.yml)
+COPY . .
+
+RUN chmod +x ./gradlew \
+    && ./gradlew :sonar-application:build -x test --no-daemon
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Locate and unpack the generated distribution zip into a known path
+RUN mkdir -p /dist \
+    && cd /dist \
+    && unzip -q /src/sonar-application/build/distributions/sonar-application-*.zip \
+    && mv sonarqube-* sonarqube
+
+# ---- Stage 2: runtime (JDK, not JRE — Elasticsearch's Java 21 entitlements ----
+# ---- system needs jdk.attach/jdk.jlink, which are missing from a JRE-only build) ----
+FROM eclipse-temurin:21-jdk-jammy AS runtime
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Elasticsearch refuses to start as root — dedicated non-root user, fixed uid
+RUN groupadd -g 1000 sonarqube \
+    && useradd -u 1000 -g sonarqube -d /opt/sonarqube -s /bin/bash sonarqube
+
+COPY --from=build --chown=sonarqube:sonarqube /dist/sonarqube /opt/sonarqube
+
+# The distribution's bundled jres/ (compressed per-OS archives) are JRE-only and
+# insufficient for Elasticsearch's Java 21 entitlements system — rely on the full
+# JDK on PATH from the base image instead, and drop the unused bundled archives.
+RUN rm -rf /opt/sonarqube/jres
+
+# Writable dirs; volumes get mounted on top of these in docker-compose.yml
+RUN mkdir -p /opt/sonarqube/data /opt/sonarqube/logs /opt/sonarqube/extensions \
+    && chown -R sonarqube:sonarqube /opt/sonarqube
+
+USER sonarqube
+WORKDIR /opt/sonarqube
+
+EXPOSE 9000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
+    CMD curl -fsS http://localhost:9000/api/system/status | grep -q '"status":"UP"' || exit 1
+
+ENTRYPOINT ["/opt/sonarqube/bin/linux-x86-64/sonar.sh", "console"]
