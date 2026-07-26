@@ -1,0 +1,13 @@
+# Ignore-file override for deploy/coolify/Dockerfile.coolify.
+# The repo's default .dockerignore ("* / !docker / !private/docker") blocks
+# everything else, including gradlew and the module sources this build needs.
+# BuildKit resolves <dockerfile-basename>.dockerignore at the context root
+# ahead of the generic .dockerignore, without touching it.
+
+.git
+.gradle
+.serena
+**/build
+**/.gradle
+**/node_modules
+deploy/coolify/Dockerfile.coolify.dockerignore
