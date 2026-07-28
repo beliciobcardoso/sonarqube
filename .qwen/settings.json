@@ -5,7 +5,10 @@
       "Bash(docker images *)",
       "Bash(docker run *)",
       "Bash(docker compose *)",
-      "Bash(sleep *)"
+      "Bash(sleep *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   },
   "$version": 4
