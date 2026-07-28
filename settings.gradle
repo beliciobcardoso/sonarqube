@@ -141,8 +141,10 @@ buildCache {
   local {
     enabled = !isCiServer
   }
-  remote(develocity.buildCache) {
-    push = isCiServer
+  if (isCiServer) {
+    remote(develocity.buildCache) {
+      push = true
+    }
   }
 }
 
