@@ -8,7 +8,9 @@
       "Bash(sleep *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(./gradlew *)",
+      "Bash(python3 *)"
     ]
   },
   "$version": 4

@@ -11,7 +11,6 @@ services:
       SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SONAR_JDBC_USERNAME: ${POSTGRES_USER}
       SONAR_JDBC_PASSWORD: ${POSTGRES_PASSWORD}
-      SONAR_SEARCH_JAVAADDITIONALOPTS: "-Dbootstrap.system_call_filter=false"
     ulimits:
       nofile:
         soft: 131072
