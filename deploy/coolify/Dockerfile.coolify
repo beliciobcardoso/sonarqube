@@ -40,6 +40,17 @@ COPY --from=build --chown=sonarqube:sonarqube /dist/sonarqube /opt/sonarqube
 # JDK on PATH from the base image instead, and drop the unused bundled archives.
 RUN rm -rf /opt/sonarqube/jres
 
+# The Gradle build always downloads the x86_64 Elasticsearch tarball, even on ARM64.
+# Bring in the missing ARM64 native libraries (libzstd.so, libvec.so) so that
+# Elasticsearch's NativeAccess can load them instead of falling back to Java-only.
+RUN ES_VERSION=9.4.3 \
+    && curl -fsSL "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}-linux-aarch64.tar.gz" \
+    | tar -xz -C /tmp "elasticsearch-${ES_VERSION}/lib/platform/linux-aarch64" \
+    && mkdir -p /opt/sonarqube/elasticsearch/lib/platform \
+    && mv "/tmp/elasticsearch-${ES_VERSION}/lib/platform/linux-aarch64" /opt/sonarqube/elasticsearch/lib/platform/ \
+    && rm -rf "/tmp/elasticsearch-${ES_VERSION}" \
+    && chown -R sonarqube:sonarqube /opt/sonarqube/elasticsearch/lib/platform/linux-aarch64
+
 # Writable dirs; volumes get mounted on top of these in docker-compose.yml
 RUN mkdir -p /opt/sonarqube/data /opt/sonarqube/logs /opt/sonarqube/extensions \
     && chown -R sonarqube:sonarqube /opt/sonarqube

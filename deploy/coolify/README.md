@@ -96,6 +96,7 @@ container's control).
 |---|---|---|
 | Container restart-loops citing `vm.max_map_count` | Step 1's setting wasn't applied on the host | Run `sysctl -w` on the host, not inside the container |
 | `Elasticsearch died while starting up, exit code: 78` / Bootstrap checks failed | ES 9.4.3 em ambiente containerizado (ARM64 / Cloud) exige desativar a checagem rígida de bootstrap | Configurado no `docker-compose.yml` via `SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"` |
+| `Unable to load native provider. Native library [.../linux-aarch64/libzstd.so] does not exist` | O build Gradle baixa o tarball x86_64 do ES mesmo em ARM64; libs nativas de plataforma ficam faltando | Resolvido no `Dockerfile.coolify`: tarball `linux-aarch64` do ES é baixado e as libs são copiadas para `elasticsearch/lib/platform/linux-aarch64/` |
 | `Elasticsearch did not exit normally` / silent crash | Out of memory (`mem_limit` too low) | Check `docker stats`, consider raising the `sonarqube` service's `mem_limit` in the compose file |
 | Build fails from lack of memory/time on Coolify's build runner | Build runner is under-resourced for Gradle | Increase Coolify's build runner resources, or revisit building outside the Dockerfile (out of scope for this PRD) |
 | SonarQube can't resolve Postgres | Wrong service name or env var not set | Confirm `SONAR_JDBC_URL=jdbc:postgresql://postgres:5432/<db>` and that `postgres` is healthy |
