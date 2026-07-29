@@ -14,18 +14,13 @@ services:
       SONAR_SEARCH_JAVAOPTS: "-Xmx512m -Xms512m"
       SONAR_WEB_JAVAOPTS: "-Xmx512m -Xms512m"
       SONAR_CE_JAVAOPTS: "-Xmx512m -Xms512m"
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
     ulimits:
       nofile:
         soft: 131072
         hard: 131072
       nproc: 8192
       memlock:
-        soft: -1
-        hard: -1
-      fsize:
-        soft: -1
-        hard: -1
-      as:
         soft: -1
         hard: -1
     mem_limit: 6g
