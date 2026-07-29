@@ -10,7 +10,13 @@
       "Bash(git commit *)",
       "Bash(git push *)",
       "Bash(./gradlew *)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(unzip *)",
+      "Bash(curl *)",
+      "Bash(tar *)",
+      "Bash(git *)"
     ]
   },
   "$version": 4
